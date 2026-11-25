@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Phishing URL Detector</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <header>
+
+        <h1>Phishing URL Detector</h1>
+
+        <p>
+            Analyze a URL and calculate its phishing risk.
+        </p>
+
+    </header>
+
+
+    <section class="scanner">
+
+        <form method="POST">
+
+            <input
+                type="text"
+                name="url"
+                placeholder="https://example.com"
+                value="{{ submitted_url }}"
+                autocomplete="off"
+                maxlength="2048"
+                required
+            >
+
+            <button type="submit">
+                ANALYZE
+            </button>
+
+        </form>
+
+        {% if error %}
+
+            <div class="error">
+                {{ error }}
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+    {% if result %}
+
+    <section class="result">
+
+        <div class="score-card">
+
+            <div class="score">
+
+                <span>
+                    {{ result.score }}
+                </span>
+
+                <small>/100</small>
+
+            </div>
+
+            <div
+                class="verdict {{ result.level }}"
+            >
+                {{ result.verdict }}
+            </div>
+
+        </div>
+
+
+        <div class="information">
+
+            <div class="info-box">
+
+                <span>DOMAIN</span>
+
+                <strong>
+                    {{ result.domain }}
+                </strong>
+
+            </div>
+
+
+            <div class="info-box">
+
+                <span>IP ADDRESS</span>
+
+                <strong>
+                    {{ result.ip or "Not resolved" }}
+                </strong>
+
+            </div>
+
+
+            <div class="info-box">
+
+                <span>HTTPS</span>
+
+                <strong>
+                    {{ "YES" if result.https else "NO" }}
+                </strong>
+
+            </div>
+
+
+            <div class="info-box">
+
+                <span>URL LENGTH</span>
+
+                <strong>
+                    {{ result.url_length }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="findings">
+
+            <h2>Security Findings</h2>
+
+            {% if result.findings %}
+
+                {% for finding in result.findings %}
+
+                    <div
+                        class="finding {{ finding.severity }}"
+                    >
+
+                        <div class="finding-title">
+
+                            {{ finding.severity.upper() }}
+
+                        </div>
+
+                        <div class="finding-text">
+
+                            {{ finding.reason }}
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            {% else %}
+
+                <div class="safe-message">
+
+                    No major suspicious indicators detected.
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+
+        <div class="technical">
+
+            <h2>Technical Information</h2>
+
+            <p>
+                <b>Submitted URL:</b>
+                {{ result.url }}
+            </p>
+
+            <p>
+                <b>Normalized URL:</b>
+                {{ result.normalized_url }}
+            </p>
+
+            {% if result.final_url %}
+
+            <p>
+                <b>Final URL:</b>
+                {{ result.final_url }}
+            </p>
+
+            {% endif %}
+
+            {% if result.http_status %}
+
+            <p>
+                <b>HTTP Status:</b>
+                {{ result.http_status }}
+            </p>
+
+            {% endif %}
+
+        </div>
+
+    </section>
+
+    {% endif %}
+
+
+    <footer>
+
+        <p>
+            Phishing URL Detector • Local Security Analysis
+        </p>
+
+        <p>
+            A risk score is an indicator, not absolute proof.
+        </p>
+
+    </footer>
+
+</div>
+
+</body>
+
+</html>
